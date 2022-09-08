@@ -29,19 +29,12 @@ setwd("data")
 
 url = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 
-download.file(url, destfile = "data//dataset.zip")
+download.file(url, destfile = "dataset.zip")
 
 
 
-# 
-# files <- c("y_train.txt", "X_train.txt")
-# 
-# temp <- lapply(files, fread, sep=" ")
-# 
-# data <- do.call(cbind, temp)
 
 
-## TASK 1: Merges the training and the test sets to create one data set.
 
 Xtrain_df <- read_delim("UCI HAR Dataset/train/X_train.txt", col_names = FALSE)
 ytrain_df <- read_tsv("UCI HAR Dataset/train/y_train.txt", col_names = FALSE)
@@ -53,11 +46,6 @@ ytest_df <- read_tsv("UCI HAR Dataset/test/y_test.txt", col_names = FALSE)
 subject_test <- read_tsv("UCI HAR Dataset/test/subject_test.txt", col_names = FALSE)
 
 
-tbl_df(Xtest_df)
-tbl_df(Xtrain_df)
-tbl_df(ytest_df)
-tbl_df(ytrain_df)
-
 
 features <- read_tsv("UCI HAR Dataset/features.txt", col_names = FALSE)
 
@@ -65,43 +53,38 @@ features <- read_tsv("UCI HAR Dataset/features.txt", col_names = FALSE)
 
 
 
-# Merge train and test df by columns will not work. They have different number of oolumns 
-
-# manualy inspecting Xtrain_df
-sum(is.na(Xtrain_df$X1)) # Apparently first column is empty
-
-# testing by trying to drop all NA columns
-
-not_all_na <- function(x) {!all(is.na(x))}
+# TASK1: Merge train and test df by columns will not work. They have different number of columns 
 
 
 
-# The number of features droped by one but they are still different
-
-# I will remove a exceeding features from test and train to match the number of features in the file 
-
-aux <- Xtrain_df %>% 
-        select(where(not_all_na)) %>% 
+Xtrain_df <- Xtrain_df %>% 
         select(1:561)
         
         
-aux2 <- Xtest_df %>% 
-        select(where(not_all_na)) %>% 
+Xtest_df <- Xtest_df %>% 
         select(1:561) 
 
-Xdf <- bind_rows(aux,aux2)
-ydf <- bind_rows(ytrain_df,ytest_df)
-subjectdf<- bind_rows(subject_train,subject_test)
+
+# Merging clean train and test data sets in Xdf
+
+Xdf <- bind_rows(Xtrain_df,Xtest_df) # Xdf contains all observations
+ydf <- bind_rows(ytrain_df,ytest_df) # ydf contains all activities labeled by their numbers
+
+#merging train and test subject column
+
+subjectdf<- bind_rows(subject_train,subject_test) 
 colnames(subjectdf) <- "SUBJECT"
+
+
 
 features = tbl_df(features)
 features = t(features) #transpose
 
 
+# making the features data set as Variable Names 
 colnames(Xdf) <- features[1,]
 
 
-colnames(Xdf)
 
 
 
@@ -140,10 +123,9 @@ colnames(final_df)<- gsub("[0-9]","",colnames(final_df)) %>% trimws()
         
 final_df <- bind_cols(subjectdf,final_df)
 
-final_df
 
 
-rm(aux,aux2,actv,features,Xdf,Xtest_df,ydf,ytest_df,Xtrain_df,ytrain_df,subject_test,subject_train,subjectdf)
+rm(aux,aux2,url,features,Xdf,Xtest_df,ydf,ytest_df,Xtrain_df,ytrain_df,subject_test,subject_train,subjectdf,not_all_na)
 
 
 # TASK 5: From the data set in step 4, creates a second, independent tidy data set with 
@@ -153,4 +135,7 @@ rm(aux,aux2,actv,features,Xdf,Xtest_df,ydf,ytest_df,Xtrain_df,ytrain_df,subject_
 summary_data <- final_df %>% 
         group_by(SUBJECT,ACTIVITIES) %>% 
         summarise_all(mean, na.rm=TRUE)
+
+
+write.table(summary_data,"mydata.txt",row.names = FALSE)
 
