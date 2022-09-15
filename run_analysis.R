@@ -115,16 +115,15 @@ columnnames2 <- columnnames2 %>%
         str_replace_all(c("^t" = "Time_Domain_", 
                           "^f" = "Frequency_Domain_",
                           "[\\(\\)-]" = ""))
-# Take a look to see if str_replace_all() worked like it should have 
-View(columnnames2)
 
-# Use these new labels as the column names in alldata_meanstd_actnames dataset
-colnames(alldata_meanstd_actnames) <- columnnames2
+
+#raplece column names
+colnames(dataset) <- columnnames2
         
 
 
 
-rm(features,Xtest_df,ytest_df,Xtrain_df,ytrain_df,subject_test,subject_train,train_dataset,test_dataset)
+rm(features,Xtest_df,ytest_df,Xtrain_df,ytrain_df,subject_test,subject_train,train_dataset,test_dataset,columnnames,columnnames2)
 
 
 # TASK 5: From the data set in step 4, creates a second, independent tidy data set with 
