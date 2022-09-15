@@ -1,7 +1,4 @@
 library(tidyverse)
-library(ggplot2)
-library(readr)
-library(data.table)  
 setwd("data")
 
 # Dplyr verbs reminders: select(look up the special), filter, arrange, mutate, summarize(subfunctions)
@@ -91,9 +88,38 @@ dataset <- dataset %>%
 
 # TASK 4: Appropriately labels the data set with descriptive variable names. 
 
+columnnames <- colnames(dataset)
+
+columnnames2 <- columnnames %>%
+        str_replace_all(c("Acc" = "Accelerometer_", 
+                          "Gyro" = "Gyroscope_", 
+                          "Mag" =  "Magnitude_",
+                          "Freq" = "Frequency", 
+                          "mean()" = "Mean",
+                          "std" = "Standard_Deviation",
+                          "BodyBody" = "Body_",
+                          "Body" = "Body_",
+                          "Jerk" = "Jerk_",
+                          "Gravity" = "Gravity_",
+                          "X" = "_X",
+                          "Y" = "_Y",
+                          "Z" = "_Z",
+                          "MeanFrequency" = "Mean_Frequency", 
+                          "Body__" = "Body_",
+                          "activity_ID" = "Activity_ID",
+                          "activity_name" = "Activity_Name",
+                          "subject_ID" = "Subject_ID"))
 
 
-colnames(dataset)<- gsub("[0-9]","",colnames(dataset)) %>% trimws()
+columnnames2 <- columnnames2 %>%
+        str_replace_all(c("^t" = "Time_Domain_", 
+                          "^f" = "Frequency_Domain_",
+                          "[\\(\\)-]" = ""))
+# Take a look to see if str_replace_all() worked like it should have 
+View(columnnames2)
+
+# Use these new labels as the column names in alldata_meanstd_actnames dataset
+colnames(alldata_meanstd_actnames) <- columnnames2
         
 
 
